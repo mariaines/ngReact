@@ -61,21 +61,24 @@
     if (fn.wrappedInApply) {
       return fn;
     } else if (fn.applyWrapped) {
+      fn.applyWrapped._scope = scope;
       return fn.applyWrapped;
     }
     var wrapped = function() {
       var args = arguments;
-      var phase = scope && scope.$root && scope.$root.$$phase;
+      var _scope = wrapped._scope;
+      var phase = _scope.$root.$$phase;
       if (phase === "$apply" || phase === "$digest") {
         return fn.apply(null, args);
       } else {
-        return scope.$apply(function() {
+        return _scope.$apply(function() {
           return fn.apply( null, args );
         });
       }
     };
     wrapped.wrappedInApply = true;
     fn.applyWrapped = wrapped;
+    fn.applyWrapped._scope = scope;
     return wrapped;
   }
 
