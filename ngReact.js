@@ -60,10 +60,12 @@
   function applied(fn, scope) {
     if (fn.wrappedInApply) {
       return fn;
+    } else if (fn.applyWrapped) {
+      return fn.applyWrapped;
     }
     var wrapped = function() {
       var args = arguments;
-      var phase = scope.$root.$$phase;
+      var phase = scope && scope.$root && scope.$root.$$phase;
       if (phase === "$apply" || phase === "$digest") {
         return fn.apply(null, args);
       } else {
@@ -73,6 +75,7 @@
       }
     };
     wrapped.wrappedInApply = true;
+    fn.applyWrapped = wrapped;
     return wrapped;
   }
 
